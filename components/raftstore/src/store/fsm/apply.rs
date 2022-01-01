@@ -1558,14 +1558,25 @@ where
         if !req.get_delete().get_cf().is_empty() {
             let cf = req.get_delete().get_cf();
             // TODO: check whether cf exists or not.
-            ctx.kv_wb.delete_cf(cf, key).unwrap_or_else(|e| {
-                panic!(
-                    "{} failed to delete {}: {}",
-                    self.tag,
-                    log_wrappers::Value::key(key),
-                    e
-                )
-            });
+            if cf == CF_LOCK {
+                ctx.kv_wb.single_delete_cf(cf, key).unwrap_or_else (|e| {
+                    panic!(
+                        "{} failed to delete {}: {}",
+                        self.tag,
+                        log_wrappers::Value::key(key),
+                        e
+                    )
+                });
+            } else {
+                ctx.kv_wb.delete_cf(cf, key).unwrap_or_else(|e| {
+                    panic!(
+                        "{} failed to delete {}: {}",
+                        self.tag,
+                        log_wrappers::Value::key(key),
+                        e
+                    )
+                });
+            }
 
             if cf == CF_LOCK {
                 // delete is a kind of write for RocksDB.

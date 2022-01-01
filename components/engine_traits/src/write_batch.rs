@@ -55,6 +55,12 @@ pub trait Mutable: Send {
     fn put_msg_cf<M: protobuf::Message>(&mut self, cf: &str, key: &[u8], m: &M) -> Result<()> {
         self.put_cf(cf, key, &m.write_to_bytes()?)
     }
+
+    /// Single delete for lock cf
+    fn single_delete_cf(&mut self, cf: &str, key :&[u8]) -> Result<()>;
+
+    /// Single delete key
+    fn single_delete(&mut self, key: &[u8]) -> Result<()>;
 }
 
 /// Batches of multiple writes that are committed atomically

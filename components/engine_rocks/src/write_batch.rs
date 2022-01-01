@@ -150,6 +150,17 @@ impl Mutable for RocksWriteBatch {
             .delete_range_cf(handle, begin_key, end_key)
             .map_err(Error::Engine)
     }
+
+    fn single_delete(&mut self, key: &[u8]) -> Result<()> {
+        self.wb.single_delete(key).map_err(Error::Engine)
+    }
+
+    fn single_delete_cf(&mut self, cf: &str, key: &[u8]) -> Result<()> {
+        let handle = get_cf_handle(self.db.as_ref(), cf)?;
+        self.wb
+            .single_delete_cf(handle, key)
+            .map_err(Error::Engine)
+    }
 }
 
 /// `RocksWriteBatchVec` is for method `multi_batch_write` of RocksDB, which splits a large WriteBatch
@@ -316,6 +327,19 @@ impl Mutable for RocksWriteBatchVec {
         let handle = get_cf_handle(self.db.as_ref(), cf)?;
         self.wbs[self.index]
             .delete_range_cf(handle, begin_key, end_key)
+            .map_err(Error::Engine)
+    }
+
+    fn single_delete(&mut self, key: &[u8]) -> Result<()> {
+        self.check_switch_batch();
+        self.wbs[self.index].single_delete(key).map_err(Error::Engine)
+    }
+
+    fn single_delete_cf(&mut self, cf: &str, key :&[u8]) -> Result<()> {
+        self.check_switch_batch();
+        let handle = get_cf_handle(self.db.as_ref(), cf)?;
+        self.wbs[self.index]
+            .single_delete_cf(handle, key)
             .map_err(Error::Engine)
     }
 }

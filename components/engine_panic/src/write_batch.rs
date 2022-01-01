@@ -82,4 +82,10 @@ impl Mutable for PanicWriteBatch {
     fn delete_range_cf(&mut self, cf: &str, begin_key: &[u8], end_key: &[u8]) -> Result<()> {
         panic!()
     }
+    fn single_delete(&mut self, key: &[u8]) -> Result<()> {
+        panic!()
+    }
+    fn single_delete_cf(&mut self, cf: &str, key :&[u8]) -> Result<()> {
+        panic!()
+    }
 }
